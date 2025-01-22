@@ -33,6 +33,16 @@ namespace EmployeeManagment.Migrations
                 nullable: false,
                 defaultValue: 0);
 
+            migrationBuilder.Sql(@"
+                Insert into 'Departments' ('Name')
+                SELECT DISTINCT 'Department' FROM 'Employees'");
+
+            migrationBuilder.Sql(@"
+                UPDATE ""Employees"" 
+                SET ""DepartmentId"" = d.'Id'
+                From 'Departments' d
+                WHERE 'Department' = d.'Name'");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_DepartmentId",
                 table: "Employees",
@@ -55,9 +65,6 @@ namespace EmployeeManagment.Migrations
             migrationBuilder.DropColumn(
                 name: "Department",
                 table: "Employees");
-
-            migrationBuilder.Sql(@"
-Insert into ""Departments"" (""Name"") values ('HR');");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
