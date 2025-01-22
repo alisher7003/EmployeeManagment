@@ -34,14 +34,15 @@ namespace EmployeeManagment.Migrations
                 defaultValue: 0);
 
             migrationBuilder.Sql(@"
-                Insert into 'Departments' ('Name')
-                SELECT DISTINCT 'Department' FROM 'Employees'");
+                INSERT INTO 'Departments' ('Name')
+                SELECT DISTINCT 'Department' FROM 'Employees'
+                WHERE 'Department' IS NOT NULL;");
 
             migrationBuilder.Sql(@"
-                UPDATE ""Employees"" 
-                SET ""DepartmentId"" = d.'Id'
+                UPDATE 'Employees' 
+                SET 'DepartmentId' = d.'Id'
                 From 'Departments' d
-                WHERE 'Department' = d.'Name'");
+                WHERE 'Employees'.'Department' = d.'Name'");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_DepartmentId",
