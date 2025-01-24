@@ -16,11 +16,16 @@ public class EmployeesControllerTests : IClassFixture<TestBaseSomething>
     [Fact]
     public async Task PostEmployeeAndGetById_ReturnsEmployee()
     {
+        // Arrange
         var newEmployee = new EmployeeDto { Name = "Toshmat", DepartmentId = 1 };
+
+        // Act
         var postEmployeeResponse = await _client.PostAsJsonAsync("/api/employees/create", newEmployee);
         postEmployeeResponse.EnsureSuccessStatusCode();
 
         var createdEmployeeId = int.Parse(await postEmployeeResponse.Content.ReadAsStringAsync());
+
+        // Assert
         Assert.True(createdEmployeeId > 0, "Employee ID should be greater than zero.");
 
         var getResponse = await _client.GetAsync($"/api/employees/{createdEmployeeId}");
