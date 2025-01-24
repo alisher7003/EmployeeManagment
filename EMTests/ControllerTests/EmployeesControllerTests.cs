@@ -1,32 +1,35 @@
-﻿using EmployeeManagment.Controllers;
-using EmployeeManagment.Data;
-using EmployeeManagment.Entities;
-using EmployeeManagment.Interfaces;
+﻿using EmployeeManagment.Entities;
 using EMTests.Abstractions;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
+using System.Net.Http.Json;
 
 namespace EMTests.ControllerTests;
 
 public class EmployeesControllerTests : IClassFixture<TestBaseSomething>
 {
-    //[Fact]
-    //public async Task GetByIdAsync_ReturnsOkObjectResult_WithEmployee()
-    //{
-    //    // Arrange
-    //    var employeeService = new Mock<IEmployeeService>();
-    //    var employee = new Employee { Id = 1, Name = "John", Department = "IT" };
-    //    employeeService.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(employee);
-    //    var controller = new EmployeesController(employeeService.Object);
+    private readonly HttpClient _client;
 
-    //    // Act
-    //    var result = await controller.Get(1);
+    public EmployeesControllerTests(TestBaseSomething testBaseSomething)
+    {
+        _client = testBaseSomething.client;
+    }
 
-    //    // Assert
-    //    var okObjectResult = Assert.IsType<OkObjectResult>(result);
-    //    var employeeResult = Assert.IsType<Employee>(okObjectResult.Value);
-    //    Assert.Equal(1, employeeResult.Id);
-    //    Assert.Equal("John", employeeResult.Name);
-    //    Assert.Equal("IT", employeeResult.Department);
-    //}
+    [Fact]
+    public async Task PostEmployeeAndGetById_ReturnsEmployee()
+    {
+        var newEmployee = new EmployeeDto { Name = "Toshmat", DepartmentId = 1 };
+        var postEmployeeResponse = await _client.PostAsJsonAsync("/api/employees/create", newEmployee);
+        postEmployeeResponse.EnsureSuccessStatusCode();
+
+        var createdEmployeeId = int.Parse(await postEmployeeResponse.Content.ReadAsStringAsync());
+        Assert.True(createdEmployeeId > 0, "Employee ID should be greater than zero.");
+
+        var getResponse = await _client.GetAsync($"/api/employees/{createdEmployeeId}");
+        getResponse.EnsureSuccessStatusCode();
+
+        var fetchedEmployee = await getResponse.Content.ReadFromJsonAsync<EmployeeDto>();
+
+        Assert.NotNull(fetchedEmployee);
+        Assert.Equal(newEmployee.Name, fetchedEmployee.Name);
+        Assert.Equal(newEmployee.DepartmentId, fetchedEmployee.DepartmentId);
+    }
 }

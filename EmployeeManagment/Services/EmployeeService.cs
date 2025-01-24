@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagment.Services;
 
-public sealed class EmployeeService(EMDbContext dbContext) : IEmployeeService
+public sealed partial class EmployeeService(EMDbContext dbContext) : IEmployeeService
 {
-    public async Task AddAsync(EmployeeDto employeeDto)
+    public async Task<int> AddAsync(EmployeeDto employeeDto)
     {
         var newEmployee = new Employee { Name = employeeDto.Name, DepartmentId = employeeDto.DepartmentId };
         await dbContext.Employees.AddAsync(newEmployee);
         await dbContext.SaveChangesAsync();
+        return newEmployee.Id;
     }
 
     public Task<decimal> AddSalaryAndBonus(decimal salary, decimal bonus)
@@ -24,7 +25,7 @@ public sealed class EmployeeService(EMDbContext dbContext) : IEmployeeService
         return await dbContext.Employees
             .AsNoTracking()
             .Where(e => e.Id == Id)
-            .Select(e => new EmployeeDto(e.Name, e.DepartmentId))
+            .Select(e => new EmployeeDto { Id = e.Id, Name = e.Name, DepartmentId = e.DepartmentId})
             .FirstOrDefaultAsync();
     }
 }

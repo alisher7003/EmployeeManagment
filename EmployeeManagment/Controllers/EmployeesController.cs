@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EmployeeManagment.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class EmployeesController : ControllerBase
 {
     private readonly IEmployeeService _employeeService;
@@ -25,8 +25,7 @@ public class EmployeesController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> AddAsync(EmployeeDto employeeDto)
     {
-        await _employeeService.AddAsync(employeeDto);
-        return Ok();
+        return Ok(await _employeeService.AddAsync(employeeDto));
     }
 
     [HttpPost(Name = "AddSalaryAndBonus")]

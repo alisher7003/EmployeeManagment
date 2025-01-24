@@ -11,3 +11,9 @@ public class Department
 
     public ICollection<Employee>? Employees { get; set; }
 }
+
+public record DepartmentDto
+{
+    public int? Id { get; set; }
+    public required string Name { get; set; }
+}

@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using EmployeeManagment.Entities;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -31,18 +33,18 @@ namespace EmployeeManagment.Migrations
                 table: "Employees",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+            defaultValue: 0);
+
+            migrationBuilder.Sql(@$"
+                INSERT INTO ""Departments"" (""Name"")
+                SELECT DISTINCT ""Department"" FROM ""Employees""
+                WHERE ""Department"" IS NOT NULL;");
 
             migrationBuilder.Sql(@"
-                INSERT INTO 'Departments' ('Name')
-                SELECT DISTINCT 'Department' FROM 'Employees'
-                WHERE 'Department' IS NOT NULL;");
-
-            migrationBuilder.Sql(@"
-                UPDATE 'Employees' 
-                SET 'DepartmentId' = d.'Id'
-                From 'Departments' d
-                WHERE 'Employees'.'Department' = d.'Name'");
+                UPDATE ""Employees"" 
+                SET ""DepartmentId"" = d.""Id""
+                FROM ""Departments"" d
+                WHERE ""Employees"".""Department"" = d.""Name"";");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_DepartmentId",

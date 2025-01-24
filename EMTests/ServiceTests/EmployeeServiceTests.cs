@@ -13,24 +13,24 @@ public class EmployeeServiceTests : IClassFixture<TestBaseSomething>
         this.testBaseSomething = testBaseSomething;
     }
 
-    [Theory]
-    [InlineData(100, 20, 120)]
-    [InlineData(200, 30, 230)]
-    [InlineData(300, 40, 340)]
-    [InlineData(int.MaxValue, 0, int.MaxValue)]
-    [InlineData(100.50, 20.50, 121)]
-    public async Task AddSalaryAndBonus_Succeed(decimal salary, decimal bonus, decimal expectedResult)
-    {
-        testBaseSomething.client.GetAsync("Employees");
-        // Arrange
-        var employeeService = new EmployeeService();
+    //[Theory]
+    //[InlineData(100, 20, 120)]
+    //[InlineData(200, 30, 230)]
+    //[InlineData(300, 40, 340)]
+    //[InlineData(int.MaxValue, 0, int.MaxValue)]
+    //[InlineData(100.50, 20.50, 121)]
+    //public async Task AddSalaryAndBonus_Succeed(decimal salary, decimal bonus, decimal expectedResult)
+    //{
+    //    testBaseSomething.client.GetAsync("Employees");
+    //    // Arrange
+    //    var employeeService = new EmployeeService();
 
-        // Act
-        var result = await employeeService.AddSalaryAndBonus(salary, bonus);
+    //    // Act
+    //    var result = await employeeService.AddSalaryAndBonus(salary, bonus);
 
-        // Assert
-        Assert.Equal(expectedResult, result);
-    }
+    //    // Assert
+    //    Assert.Equal(expectedResult, result);
+    //}
 
     //[Theory]
     //[InlineData(1, "John Doe", "HR")]

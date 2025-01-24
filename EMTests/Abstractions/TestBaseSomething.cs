@@ -1,19 +1,15 @@
-﻿
+﻿using EmployeeManagment;
 using EmployeeManagment.Data;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace EMTests.Abstractions;
 
 public class TestBaseSomething : IAsyncLifetime
 {
-    public EMDbContext dbContext = default!;
     public HttpClient client = default!;
-    private IServiceProvider serviceProvider = default!;
     private WebApplicationFactory<Program> factory = default!;
 
     public async Task InitializeAsync()
@@ -45,7 +41,7 @@ public class TestBaseSomething : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        // Clean up the test database
+        var dbContext = factory.Services.GetRequiredService<EMDbContext>();
         if (dbContext != null)
         {
             await dbContext.Database.EnsureDeletedAsync();
@@ -56,14 +52,9 @@ public class TestBaseSomething : IAsyncLifetime
         factory?.Dispose();
     }
 
-    protected T GetService<T>()
-    {
-        return serviceProvider.GetRequiredService<T>();
-    }
-
     private string GetTestDatabaseConnectionString()
     {
-        var dbName = $"TestDb_{Guid.NewGuid()}";
+        var dbName = $"TestDb";
         return $"Host=localhost;Port=5432;Database={dbName};Username=postgres;Password=password";
     }
 }

@@ -16,4 +16,9 @@ public class Employee
 }
 
 
-public record EmployeeDto(string Name, int DepartmentId);
+public record EmployeeDto
+{
+    public int? Id { get; set; }
+    public required string Name { get; set; }
+    public int DepartmentId { get; set; }
+}
