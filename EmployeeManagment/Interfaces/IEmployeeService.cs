@@ -4,7 +4,9 @@ namespace EmployeeManagment.Interfaces;
 
 public interface IEmployeeService
 {
-    Task<Department?> GetByIdAsync(int Id);
+    Task<EmployeeDto?> GetByIdAsync(int Id);
+
+    Task<int> AddAsync(EmployeeDto employeeDto);
 
     Task<decimal> AddSalaryAndBonus(decimal salary, decimal bonus);
 }

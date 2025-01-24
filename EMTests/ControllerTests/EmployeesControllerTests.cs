@@ -2,12 +2,13 @@
 using EmployeeManagment.Data;
 using EmployeeManagment.Entities;
 using EmployeeManagment.Interfaces;
+using EMTests.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
 namespace EMTests.ControllerTests;
 
-public class EmployeesControllerTests
+public class EmployeesControllerTests : IClassFixture<TestBaseSomething>
 {
     //[Fact]
     //public async Task GetByIdAsync_ReturnsOkObjectResult_WithEmployee()

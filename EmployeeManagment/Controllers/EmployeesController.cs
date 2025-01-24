@@ -16,10 +16,17 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpGet("{id}", Name = "GetEmployee")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> GetAsync(int id)
     {
         var employee = await _employeeService.GetByIdAsync(id);
         return Ok(employee);
+    }
+
+    [HttpPost("create")]
+    public async Task<IActionResult> AddAsync(EmployeeDto employeeDto)
+    {
+        await _employeeService.AddAsync(employeeDto);
+        return Ok();
     }
 
     [HttpPost(Name = "AddSalaryAndBonus")]

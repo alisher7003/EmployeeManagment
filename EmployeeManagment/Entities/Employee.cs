@@ -4,10 +4,10 @@ namespace EmployeeManagment.Entities;
 
 public class Employee
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
 
     [MaxLength(255)]
-    public required string Name { get; private set; }
+    public required string Name { get; set; }
 
     [Required]
     public required int DepartmentId { get; set; }
@@ -16,4 +16,4 @@ public class Employee
 }
 
 
-public record EmployeeDto(string Name, string DepartmentName);
+public record EmployeeDto(string Name, int DepartmentId);
