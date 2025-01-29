@@ -1,5 +1,6 @@
 ﻿using EmployeeManagment;
 using EmployeeManagment.Data;
+using EmployeeManagment.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,8 @@ namespace EMTests.Abstractions;
 public class TestBaseSomething : IAsyncLifetime
 {
     public HttpClient client = default!;
-    private WebApplicationFactory<Program> factory = default!;
+    public WebApplicationFactory<Program> factory = default!;
+    public IServiceProvider serviceProvider = default!;
 
     public async Task InitializeAsync()
     {
@@ -25,6 +27,8 @@ public class TestBaseSomething : IAsyncLifetime
                         d => d.ServiceType == typeof(DbContextOptions<EMDbContext>));
                     if (descriptor != null)
                         services.Remove(descriptor);
+                    var empDescriptor = services.SingleOrDefault(
+                        d => d.ServiceType == typeof(IEmployeeService));
 
                     // Register a new DbContext for testing
                     var connectionString = GetTestDatabaseConnectionString();
@@ -37,16 +41,20 @@ public class TestBaseSomething : IAsyncLifetime
 
         // Create HttpClient for testing
         client = factory.CreateClient();
+        serviceProvider = factory.Services;
     }
 
     public async Task DisposeAsync()
     {
-        var dbContext = factory.Services.GetRequiredService<EMDbContext>();
+        await using var scope = factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<EMDbContext>();
         if (dbContext != null)
         {
+            await dbContext.Database.CloseConnectionAsync();
             await dbContext.Database.EnsureDeletedAsync();
             await dbContext.DisposeAsync();
         }
+
 
         client?.Dispose();
         factory?.Dispose();

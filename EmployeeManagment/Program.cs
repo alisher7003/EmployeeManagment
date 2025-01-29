@@ -1,4 +1,6 @@
+using EmployeeManagment.BackgroundServices;
 using EmployeeManagment.Data;
+using EmployeeManagment.Hubs;
 using EmployeeManagment.Interfaces;
 using EmployeeManagment.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,8 @@ builder.Services.AddDbContext<EMDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddSignalR();
+builder.Services.AddHostedService<TelegramBotService>();
 
 var app = builder.Build();
 
@@ -31,11 +35,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Services.ApplyMigrations();
+app.UseCors(app => app.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<OpenAIHub>("/chatHub");
 
 app.Run();

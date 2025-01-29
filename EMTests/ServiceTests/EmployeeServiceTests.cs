@@ -1,16 +1,29 @@
 ﻿using EmployeeManagment.Entities;
+using EmployeeManagment.Interfaces;
 using EmployeeManagment.Services;
 using EMTests.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EMTests.ServiceTests;
 
 public class EmployeeServiceTests : IClassFixture<TestBaseSomething>
 {
-    private readonly TestBaseSomething testBaseSomething;
+    private readonly IServiceProvider serviceProvider;
 
     public EmployeeServiceTests(TestBaseSomething testBaseSomething)
     {
-        this.testBaseSomething = testBaseSomething;
+        serviceProvider = testBaseSomething.serviceProvider;
+    }
+
+    [Fact]
+    public async Task AddEmployeeAndGetById_ReturnsEmployee()
+    {
+        await using var scope = serviceProvider.CreateAsyncScope();
+        var employeeService = scope.ServiceProvider.GetRequiredService<IEmployeeService>();
+        var newEmployee = new EmployeeDto { Name = "Toshmat", DepartmentId = 1 };
+        var createdEmployeeId = await employeeService.AddAsync(newEmployee);
+
+        Assert.True(createdEmployeeId > 0, "Employee ID should be greater than zero.");
     }
 
     //[Theory]

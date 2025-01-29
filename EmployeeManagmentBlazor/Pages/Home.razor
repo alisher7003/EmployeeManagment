@@ -1,0 +1,103 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
+<h3>Ask a Question</h3>
+
+<div>
+    <label for="questionInput">Question:</label>
+    <input id="questionInput" @bind="Question" class="form-control" />
+</div>
+
+<button class="btn btn-primary mt-2" @onclick="PostQuestion">Ask</button>
+
+<h4 class="mt-4">Answer:</h4>
+<p>@Answer</p>
+
+@code {
+    [Inject]
+    public HttpClient httpClient { get; set; } = null!;
+    private HubConnection? hubConnection;
+    private string Question { get; set; } = "";
+    private string Answer { get; set; } = "Waiting for answer...";
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"new page {Guid.NewGuid()}");
+    }
+
+    private async Task EstablishSignalRConnection()
+    {
+        // Initialize the SignalR hub connection
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7065/chathub")
+            .Build();
+
+        // Define a handler for receiving messages from the server
+        hubConnection.On<AnswerDto>("ReceiveAnswer", async (answer) =>
+        {
+            Answer = answer.Answer;
+            StateHasChanged();
+            AnswerCame();
+            await hubConnection.DisposeAsync();
+        });
+
+        // Start the SignalR connection
+        await hubConnection.StartAsync();
+    }
+
+    private void AnswerCame()
+    {
+        Console.WriteLine("Answer came");
+    }
+
+    private async Task PostQuestion()
+    {
+        await EstablishSignalRConnection();
+        if (hubConnection?.ConnectionId is null)
+        {
+            Answer = "Error: Unable to connect to the SignalR hub.";
+            return;
+        }
+
+        // Send the question to the API
+        var questionDto = new QuestionDto
+        {
+            ConnectionId = hubConnection.ConnectionId,
+            Question = Question
+        };
+
+        var response = await httpClient.PostAsJsonAsync("https://localhost:7065/api/OpenApi/question", questionDto);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Answer = "Question sent. Waiting for the answer...";
+        }
+        else
+        {
+            Answer = "Error: Unable to send the question.";
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    public class QuestionDto
+    {
+        public string ConnectionId { get; set; } = string.Empty;
+        public string Question { get; set; } = string.Empty;
+    }
+
+    public class AnswerDto
+    {
+        public string Answer { get; set; } = string.Empty;
+    }
+}

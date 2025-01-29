@@ -9,15 +9,17 @@ public sealed partial class EmployeeService(EMDbContext dbContext) : IEmployeeSe
 {
     public async Task<int> AddAsync(EmployeeDto employeeDto)
     {
+
         var newEmployee = new Employee { Name = employeeDto.Name, DepartmentId = employeeDto.DepartmentId };
         await dbContext.Employees.AddAsync(newEmployee);
         await dbContext.SaveChangesAsync();
         return newEmployee.Id;
     }
 
-    public Task<decimal> AddSalaryAndBonus(decimal salary, decimal bonus)
+    public async Task<decimal> AddSalaryAndBonus(decimal salary, decimal bonus)
     {
-        return Task.FromResult(salary + bonus);
+
+        return 0;
     }
 
     public async Task<EmployeeDto?> GetByIdAsync(int Id)
