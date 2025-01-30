@@ -24,8 +24,7 @@ namespace EmployeeManagment.BackgroundServices
                 AllowedUpdates = new[] { UpdateType.Message, UpdateType.CallbackQuery, UpdateType.InlineQuery } // Only listen to messages,
             };
             // we can use DbContextFactory instead of this code.
-            using var scope = serviceProvider.CreateScope();
-            dbContext = scope.ServiceProvider.GetRequiredService<EMDbContext>();
+            dbContext = serviceProvider.GetRequiredService<EMDbContext>();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
